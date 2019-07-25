@@ -70,15 +70,78 @@
 <script src="../../common/js/jquery.js"></script>
 <script>
 // 第1問  id='q1'の要素の文字色を赤色にせよ。
+  $(function() {  // <--これはあったほうがいいらしい、全体を囲んでる
+    $("#q1").css("color","red");  //idがq1のもののcssのcolorをredに変化させる
+
 // 第2問  id='q2'の要素をクリックしたら背景色をピンクにせよ。
+    $("#q2").click(function() {  //clickしたときにthis(この要素)のcssを変化させる　thisはイベントが発生した要素のことを指す
+      $(this).css("background-color","pink");
+    });
+  
 // 第3問  id='q3'の要素をクリックしたら2秒かけてフェードアウトさせよ。
+    $("#q3").click(fadeOut);  //clickにfadeOutという引数を渡し、function fadeOutの処理を下に記述する
+    function fadeOut() {      //引数というよりもfadeOutという名前の関数を呼び出し、fadeOutの処理の指定を下でしている感じかもしれない
+      $(this).fadeOut(2000);
+    }
+    // $("#q3").click(function() {  //<--やっていることは上と同じ、こっちのほうが分かりやすい
+    //   $(this).fadeOut(2000);
+    // });
+    
+
 // 第4問  id='q4'の要素をクリックしたらこの要素の前後とこの要素内の前後にテキストを挿入せよ。
+    $("#q4").click(function(){
+      $(this).prepend("DOMの中の前")
+             .append("DOMの中の後ろ")
+             .before("DOMの前")
+             .after("DOMの後ろ");
+    });
 // 第5問  id='q5'の要素をクリックしたらこの要素にlargeというクラスを付与せよ。
+
+    $("#q5").click(function() {
+      $(this).addClass("large");  //<--これでcssの使われていなかったlargeがq5に適用される
+    });
+
 // 第6問  id='q6'の要素をクリックしたらこの要素を2秒かけてmargin-topとmargin-leftを100pxの位置に移動させよ。
+    $("#q6").click(function() {
+      $(this).animate({  // animateの引数にオブジェクトを指定して、marginTopとmarginLeftの処理を行う
+        "marginTop": 100, //px入れたかったらStringにしないといけないので""で囲む、問題なく動いた
+        "marginLeft": 100 //keyの""もいらなそう、単位がmsなので2000msで1s
+      },2000);
+    });
+    
 // 第7問  id='q7'の子要素をクリックしたら、その要素のインデックス（何番目か）をconsole.log()とalert()を用いて表示させよ。
+    $("#q7").find("li").click(function() {  //findで条件に合った子要素を選択できる
+      var targetNum = $(this).index();  //indexは要素の順番を教えてくれる
+      console.log(targetNum);
+      alert(targetNum);
+    });
+    
 // 第8問  id='q8'の要素をhoverしたらlargeというクラスを付与し、hoverが外れたら、クラスを削除せよ。
+    // $("#q8").mouseenter(function() {
+    //           $(this).addClass("large")
+    //         })
+    //         .mouseleave(function() {
+    //           $(this).removeClass("large")
+    //         });
+
+    $("#q8").hover(function() {  //hoverはmouseenterとmouseleaveの機能がまとまったもの
+      $(this).addClass("large");  //第一引数がaddClassの関数、第二引数がremoveClassの関数でマウスが重なったときに1つめ、
+    }, function() {               //マウスが離れた時の処理が二つ目の関数が実行される
+      $(this).removeClass("large");
+    });
+
 // 第9問  id='q9'の要素をクリックしたらこの要素に設定してあるdata属性をconsoleに表示せよ。
+    $("#q9").click(function() { //q9がクリックされたときに関数が実行される
+      var q9Data = $(this).data("text");　//変数　q9Dataにq9のdata属性が格納され、
+      console.log(q9Data);          //console.log(q9Data)でconsoleに表示される,textを指定するとjQueryが表示される
+    });
+    
 // 第10問 id='q10'の子要素をクリックしたら、その要素のインデックスと等しいid='q11'の子要素にlargeというクラスを追加せよ。
+    $("#q10").find("li").click(function() {
+      var sameNum = $(this).index();  //liのindexを取得して変数sameNumに格納する
+      $("#q11").find("li").eq(sameNum).addClass("large"); //eq()で指定したポジションの要素を取り出す
+    });
+  });
 </script>
 </body>
 </html>
