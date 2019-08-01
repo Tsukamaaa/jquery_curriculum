@@ -27,6 +27,14 @@
       // .click() クリック時のイベントを登録する。
       // .fadeIn() 一定時間かけてフェードインする。
       // .fadeOut() 一定時間かけてフェードアウトする。
+      $(function() {
+        $(".modal-show").click(function() {  //modal-showはclassなので.modal-showで指定できる .modal-showはclickのボタンのところ
+          $(".modal").fadeIn(500);           //clickメソッドを使ってクリックしたときの動きを指定するためにfunctionを用意
+        });                                  //.modal-showをクリックしたときに.modalが0.5sでfadeInしてくるようにする .modal-closexボタン
+        $(".modal-close").click(function() {
+          $(".modal").fadeOut(500);
+        });
+      });
     </script>
   </body>
 </html>

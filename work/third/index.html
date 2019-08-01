@@ -30,7 +30,15 @@
       // .eq() 引数に応じたindexの要素を指定します。
       // .addClass() クラスを追加します。
       // .removeClass() クラスを削除します。
-    </script>
+      $(function() {
+        $(".nav").find("li").click(function() {  //class .navの子要素liをクリックしたときに、同じindexを持つものを表示したい
+          var indexNum = $(this).index();  //thisは.nav li indexを変数 indexNumに格納
+          //console.log(indexNum);  //console.log(indexNum)は変数の中身確認用
+        $(".contents").find("li").addClass("is-hidden");  //まずは.contents liすべてにis-hiddenを付けて全部を非表示にする
+        $(".contents").find("li").eq(indexNum).removeClass("is-hidden");  //そのあとindexが同じもののis-hiddenを取り除くことで、indexに応じたものだけ表示する
+        });
+      });
+    </script> 
   </body>
 </html>
 

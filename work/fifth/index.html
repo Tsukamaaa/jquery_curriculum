@@ -97,6 +97,44 @@
       // .data('') DOM要素にあるdata-~を取得できる
       // .change() セレクトボックスの値の変更をキャッチする関数
       // $().each() DOM要素を1つずつループ処理をする（ループ内で$(this)を使うと要素がひとつずつ取得できる）
+
+// $(function() {
+//   $(".select").change(function() { //change()は中の値が変更されたら発動する。selectの中身がoptionによって変化するのでこれを使う
+//     var selectVal = $(this).val(); //.val()でoptionのvalueを変数に格納する。 ここのthisはselect
+//     console.log(selectVal);       //確認用
+//     if(selectVal=="all"){     //ifで条件分岐を作る　allが変数に格納されたときは全部表示する
+//       $(".list").children("li").each(function() {  //.each()はli一つずつに対して処理を行う
+//         $(this).show();                            //ここでは全部表示したいのでthis==.list liをshow();
+//       });
+//     }else {                         //allではない場合
+//       $(".list").children("li").each(function() {  //category-typeとselectValの中身が同じなら表示
+//         if($(this).data("category-type")==selectVal){  //違う場合はhide()で非表示にする
+//           $(this).show();
+//         }else {
+//           $(this).hide();
+//         }
+//       });
+//     }
+//   });
+// });
+    
+$(function() {
+  $("select").change(function() {  //change()は中の値が変更されたら実行される
+    var Val = $(this).val();      //selectのoptionのvalueを変数に格納する
+    if(Val == "all"){             //条件分岐を作る 変数の中身がallの場合
+      $(".list").children("li").show();   //すべてを表示すればよいので.list liをshow();
+    }else {
+      $(".list").children("li").each(function() {  //all以外の場合さらに条件を付ける
+        if($(this).data("category-type") == Val){  //category-typeと変数が等しい場合
+          $(this).show();                          //表示する
+        }else {                                    //category-typeと変数が等しくない場合
+          $(this).hide();                          //表示しない
+        }
+      });
+    }
+  });
+});
+        
     </script>
   </body>
 </html>

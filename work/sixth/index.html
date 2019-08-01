@@ -26,6 +26,23 @@
       // .keyup() 文字入力後に発火されるイベントです。
       // .replace(/\s+/g,'').length 改行を含まない文字数を取得します。
       // .val() input要素のvalueを取得します。
+
+      $(function() {
+        $(".input").keyup(function() {
+          var count = $(this).val().replace(/\s+/g, "").length;
+          var countDown = 30-count;
+          //replace(/\s+/)は\sという空白の文字に一致するという正規表現を/正規表現/として囲んでいる形
+          //replace(/\s+/g)のgは文字列全体にマッチしているか、gがないと一回マッチしたら終了ほかにもi:大文字小文字の区別をするか、m:複数行に対応するか、u:Unicode対応など
+          // console.log(countDown); //確認用
+          if(count <= 30){        ///\s/に関しては改行\n、タブ\t、復帰\r、改ページ\f、垂直タブ\v　全部が当てはまる +は+の前の文字が一個以上連続したものにマッチ
+            $(".rest-count").text(countDown)
+                            .removeClass("red");
+          }else {
+            $(".rest-count").text(countDown)
+                            .addClass("red");
+          }
+        })
+      })
     </script>
   </body>
 </html>

@@ -82,7 +82,7 @@
     $("#q3").click(fadeOut);  //clickにfadeOutという引数を渡し、function fadeOutの処理を下に記述する
     function fadeOut() {      //引数というよりもfadeOutという名前の関数を呼び出し、fadeOutの処理の指定を下でしている感じかもしれない
       $(this).fadeOut(2000);
-    }
+    };
     // $("#q3").click(function() {  //<--やっていることは上と同じ、こっちのほうが分かりやすい
     //   $(this).fadeOut(2000);
     // });
@@ -142,6 +142,7 @@
       $("#q11").find("li").eq(sameNum).addClass("large"); //eq()で指定したポジションの要素を取り出す
     });
   });
+  
 </script>
 </body>
 </html>
