@@ -11,7 +11,29 @@
   </head>
   <body>
     <div class="wrapper">
-      <ul class="colorList"></ul>
+      <ul class="colorList">
+        <li class="colorList__item">
+          <p class="colorList__title" style="background-color: ;"></p>
+        </li>
+        <li class="colorList__item">
+          <p class="colorList__title" style="background-color: ;"></p>
+        </li>
+        <li class="colorList__item">
+          <p class="colorList__title" style="background-color: ;"></p>
+        </li>
+        <li class="colorList__item">
+          <p class="colorList__title" style="background-color: ;"></p>
+        </li>
+        <li class="colorList__item">
+          <p class="colorList__title" style="background-color: ;"></p>
+        </li>
+        <li class="colorList__item">
+          <p class="colorList__title" style="background-color: ;"></p>
+        </li>
+        <li class="colorList__item">
+          <p class="colorList__title" style="background-color: ;"></p>
+        </li>
+      </ul>
     </div>
     <script src="../../common/js/jquery.js"></script>
     <script>
@@ -42,6 +64,24 @@
       // </li>
       //
       // このテンプレートに取得してきた中身を入れて表示します。
+      $(function() {
+        $.ajax({
+          url: "./data.json",  //index.htmlと同じ階層のdata.jsonをurlに指定する
+          type: "GET",　　　　　//data.jsonから情報を取得するので通信のタイプはGET
+          dataType: "json",    //読み込むもののタイプはjson
+          error: function(data) {　//もし通信がerrorだった時に教えてくれる用
+          alert('error');　　　　　 //alertが出てくる
+          }
+        })
+        .done(function(data) {    //　dataを引数にしないと話が進まない
+          console.log(data);      //  dataの中身の確認
+          $(".colorList__title").each(function(index, item) { //function(index, item)が超便利　indexは要素全部のindexを取得し、itemはそれぞれの中身を返してくれる
+            console.log(item);　　//変更を加えたいliそれぞれに処理をするためeachを使う。itemが便利
+            $(item).append(data.colorsArray[index].colorName)　//itemの前にdataオブジェクトの中身のcolorsArrayのvalueの配列のindex番目の中身を取り出す
+                                  .css("background-color", data.colorsArray[index].hexValue);
+          });
+        });
+      });
     </script>
   </body>
 </html>

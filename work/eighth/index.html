@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html class="scroll__html">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="../../common/css/base.css">
     <link rel="stylesheet" href="./css/style.css">
   </head>
-  <body>
+  <body class="scroll__body">
     <div class="wrapper">
       <div class="menu">
         <span class="menu__btn" data-scroll-place-type="home">Home</span>
@@ -25,7 +25,7 @@
         <p class="body">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc, quis gravida magna mi a libero. Fusce vulputate eleifend sapien. Vestibulum purus quam, scelerisque ut, mollis sed, nonummy id, metus. Nullam accumsan lorem in dui. Cras ultricies mi eu turpis hendrerit fringilla. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; In ac dui quis mi consectetuer lacinia. Nam pretium turpis et arcu. Duis arcu tortor, suscipit eget, imperdiet nec, imperdiet iaculis, ipsum. Sed aliquam ultrices mauris. Integer ante arcu, accumsan a, consectetuer eget, posuere ut, mauris. Praesent adipiscing. Phasellus ullamcorper ipsum rutrum nunc. Nunc nonummy metus. Vestibulum volutpat pretium libero. Cras id dui. Aenean ut</p>
       </div>
       <span class="scrollTopBtn" style="display: none;"></span>
-    </div>
+    </div>  
     <script src="../../common/js/jquery.js"></script>
     <script>
       // 今回やるのはページ内スクロールです。
@@ -42,6 +42,53 @@
       // .offset().top 要素の位置を取得します。
       // .fadeIn() 要素をフェードインさせる。
       // .fadeOut() 要素をフェードアウトさせる。
+
+      $(function() { //body,html <<<これはor,　bodyhtmlでandの意味
+      //  ボタンでスクロール
+        $(".menu__btn").click(function() {
+          var speed = 500;  // >>スクロールするスピードの指定
+          var target = $(this).data("scroll-place-type");  // >>clickしたもののdata取得 thisはmenu__btn
+
+          $(".contents").children(".title").each(function(index,item) {  //thisありすぎ問題解決用
+            if($(item).data("scroll-place-type") === target){           //indexがないとitemにindexが入る　第一引数がindex,第二引数がitemっぽい
+              var targetPosition = $(item).offset().top;    //item =  $(".contents").children(".title")のtopを取得
+              //console.log(targetPosition);  //ここだと中身が見れる
+              $(".scroll__body,.scroll__html").animate({  //body or htmlをanimateでスクロールする
+                scrollTop: targetPosition
+              }, speed)  //.scroll__body,.scroll__htmlがwindow,documentだと動かない
+              //console.log(targetPosition);
+            }; //if内で処理をすると条件にあてはまるものだけ処理を行ってくれる
+          });  //each内だと$(".scroll...")の処理がeachで繰り返されてしまう
+        });
+
+        $(document).scroll(function() {  //windowでも動くけどwindowのほうが読み込む量が多いと思う
+          var targetScroll = $(".contents").offset().top;　//文字の入ったcontentsの高さを変数に格納する
+          var scrollCount = $(document).scrollTop();       //documentのトップからのスクロール量を格納する
+          if(scrollCount > targetScroll){                  //scroll量がtargetScrollのラインを越えたらボタンをfadeIn,戻ったらfadeOut
+            $(".scrollTopBtn").fadeIn(500);
+          }else{
+            $(".scrollTopBtn").fadeOut(500);
+          };
+        });
+
+        $(".scrollTopBtn").click(function() { //出てきたボタンを押してトップに移動する処理
+          $(".scroll__body,.scroll__html").animate({　//タグで飛ぶ時と同様にhtml,bodyをスライドさせる
+            scrollTop: 0
+          }, 300)
+        })
+      });
+
+      //windowオブジェクトとdocumentオブジェクト
+      //windowオブジェクトの中にdocumentオブジェクトがある
+      //window.document.write()　オブジェクト、プロパティ、メソッドの並び
+
+      //$(document).readyと$(window).loadの違い
+      // 1,ページの読み込みが始まる
+      // 2,HTMLの読み込みが終わる
+      // 3,$(document).readyが実行
+      // 4,画像など含めすべてのコンテンツの読み込みが終わる
+      // 5,$(window).loadが実行
+     
     </script>
   </body>
 </html>

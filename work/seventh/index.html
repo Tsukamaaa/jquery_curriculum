@@ -34,12 +34,148 @@
       // .data() 要素のdata属性を取得します。
       // .width() 要素の幅を取得します。
       // .length 要素の個数を取得します。
+      
+      //配列なし
+      // $(function() {
+        
+      //   var clickFlag = true;
+      //   var sliderCurrent = 0;
+      //   var sliderWidth = $(".slider-list").width();  //listの横幅
+      //   var sliderIndex = $(".slider-list").children("li").length-1; //0から3
+      //  // var sliderNumber = $(".slider-list").children("li").length;  //slideの枚数 
+      //   var sliderSize = $(".slider-list").children("li").width();  //slideの大きさ
 
-      $(function() {
-        $(".is-prev").click(function(){
-          
-        })
-      })
+      //   // var sliderArray = [];  //slider-list.liの位置情報が格納されている
+      //   // for(var i= 0; i < $(".slider-list").children("li").length; i++){
+      //   //   sliderArray[i] = i;
+      //   // };
+        
+        
+      //   console.log(sliderWidth);
+      //   //console.log(sliderNumber);
+      //   console.log(sliderSize);
+      //   console.log(sliderIndex);
+
+      //   $(".slider-ctrl-btn").click(function() {
+      //     if(clickFlag === true && $(this).data("ctrl") === "prev"){
+      //       clickFlag = false;
+      //       sliderCurrent--;
+      //       if(sliderCurrent < 0){
+      //         $(".slider-list").stop().animate({
+      //           left: sliderIndex * -sliderSize //sliderArrayの最大値 * -sliderSize
+      //         },500, "linear",function () {
+      //           clickFlag = true;
+      //         });
+      //         sliderCurrent = sliderIndex;
+      //         console.log(sliderCurrent);
+      //       }else{
+      //         $(".slider-list").stop().animate({
+      //           left: sliderCurrent * -sliderSize
+      //         },500 ,"linear", function() {
+      //           clickFlag = true;
+      //         });
+      //         console.log(sliderCurrent);
+      //       };
+
+      //     }else if(clickFlag === true && $(this).data("ctrl") === "next"){
+      //       clickFlag = false;
+      //       sliderCurrent++;
+      //       if(sliderCurrent > sliderIndex){
+      //         $(".slider-list").stop().animate({
+      //           left: 0 * sliderSize
+      //         },500,"linear", function() {
+      //           clickFlag = true;
+      //         });
+      //         sliderCurrent = 0;
+      //         console.log(sliderCurrent);
+      //       }else{
+      //         $(".slider-list").stop().animate({
+      //           left: sliderCurrent * -sliderSize
+      //         },500,"linear", function(){
+      //           clickFlag = true;
+      //         });
+      //         console.log(sliderCurrent); 
+      //       };　　　これはimageのサイズが同じだから問題ないが、imageのサイズが変わってくると表示画面のほうもその都度変えないといけないので却下
+      //     };　　　　それとimageのサイズも異なる場合はスクロールがずれてくるので、そこも変更しないといけない
+      //   });
+      // });
+
+    $(function() {
+      var clickFlag = true;     //animateを止める用
+      var sliderCurrent = 0;    //元の位置指定用
+      var sliderSize = [];　　　//sliderのサイズ図るよう、[600, 600, 600, 600]
+      var sliderPlus = [];　　　//sliderのサイズを足して積み重ねるよう [0, 600, 1200, 1800]
+      var sliderListChild = $(".slider-list").children("li");
+      var sliderCount = 0;　　　//引数に使う用の変数
+
+      for( var i = 0; i < sliderListChild.length; i++){
+        sliderSize[i] = sliderListChild.eq(i).width();  //ひとつずつのサイズを取得する用のfor文
+      }
+      console.log(sliderSize); //  >> sliderSizeは　[600, 600, 600, 600]
+
+      var j = 0;  // while処理用の初期値
+      var sliderSum = 0;　//合計していくものの初期値
+      while(j < sliderListChild.length){   //widthの合計で位置情報を得るためのwhile文
+        sliderSum = sliderSum + sliderSize[j];
+
+        //console.log(sliderSum);
+        sliderPlus[j] = sliderSum;　//[j]の時にsliderSumを入れて配列にする
+        j++;    //while内は順番を気にする　j++が上にあるとj = 0の時の処理がされない
+      }
+      sliderPlus.unshift(sliderCurrent); //先頭に要素を追加する　最初の場所は0
+      console.log(sliderPlus); //  >>sliderPlusは　[0, 600, 1200, 1800]
+
+      var sliderListSize = sliderPlus[sliderListChild.length]　//imageが増えた時に対応できるよう　slider-listの幅をsliderPlusの引数が最大時のサイズにする
+      $(".slider-list").width(sliderListSize);
+
+      $(".slider-ctrl-btn").click(function() {   //btnをクリックしたとき
+        if(clickFlag === true && $(this).data("ctrl") === "prev"){　//clickFlagがtrueかつctrlがprevなら
+          clickFlag = false;　　//flagを一回折って連打しても次のアニメーションが進まないようにする
+          sliderCount--;        //sliderCountをクリックするたびマイナスにする
+          if(sliderCount < 0){　//端まで来たら反対側に飛ばす処理
+            sliderCount = sliderListChild.length-1;　　//sliderCountを最大のsliderListChild.length-1に置き換える
+            $(".slider-area").width(sliderSize[sliderCount]);   //slider-areaのwidthをsliderSizeと合わせることで違う大きさのもの対応する
+            $(".slider-list").stop().animate({
+              left: -sliderPlus[sliderCount]  //sliderArrayの引数にsliderCountを使う　これで場所の指定をする
+            } ,500, function() {
+              clickFlag = true;   //animationが終わったらflagを立て直す
+            });
+            console.log(sliderCount); //elseの処理はこれとほとんど変わらない
+          }else{
+            $(".slider-area").width(sliderSize[sliderCount])
+            $(".slider-list").stop().animate({
+              left: -sliderPlus[sliderCount]
+            },500, function(){
+              clickFlag = true;
+            });
+            console.log(sliderCount);
+          };
+
+        }else if(clickFlag === true && $(this).data("ctrl") === "next"){
+          clickFlag = false;
+          sliderCount++;
+          if(sliderCount > sliderListChild.length-1){
+            sliderCount = 0;
+            $(".slider-area").width(sliderSize[sliderCount]);
+            $(".slider-list").stop().animate({
+              left: -sliderPlus[0]
+            }, 500, function() {
+              clickFlag = true;
+            });
+            console.log(sliderCount);
+          }else{
+            $(".slider-area").width(sliderSize[sliderCount]);
+            $(".slider-list").stop().animate({
+              left: -sliderPlus[sliderCount]
+            }, 500, function(){
+              clickFlag = true;
+            });
+            console.log(sliderCount);
+          }
+        }
+      });
+    })
+    
     </script>
   </body>
 </html>
