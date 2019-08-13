@@ -45,6 +45,7 @@
         </li>
       </ul>
     </div>
+    
     <script src="../../common/js/jquery.js"></script>
     <script>
       // 今回やるのはドロップメニューです。
@@ -58,7 +59,7 @@
       // .stop() 現在動作中のアニメーション処理を全て中止します。
 
       $(function() {
-        $("li").hover(function() {
+        $(".menu__list").children("li").hover(function() {
           $(this).children("ul").stop().slideDown();
         }, function() {
           $(this).children("ul").stop().slideUp();

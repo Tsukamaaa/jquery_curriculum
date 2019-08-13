@@ -102,7 +102,7 @@
 
     $(function() {
       var clickFlag = true;     //animateを止める用
-      var sliderCurrent = 0;    //元の位置指定用
+      // var sliderCurrent = 0;    //元の位置指定用
       var sliderSize = [];　　　//sliderのサイズ図るよう、[600, 600, 600, 600]
       var sliderPlus = [];　　　//sliderのサイズを足して積み重ねるよう [0, 600, 1200, 1800]
       var sliderListChild = $(".slider-list").children("li");
@@ -111,68 +111,47 @@
       for( var i = 0; i < sliderListChild.length; i++){
         sliderSize[i] = sliderListChild.eq(i).width();  //ひとつずつのサイズを取得する用のfor文
       }
-      console.log(sliderSize); //  >> sliderSizeは　[600, 600, 600, 600]
+      // console.log(sliderSize); //  >> sliderSizeは　[600, 600, 600, 600]
 
-      var j = 0;  // while処理用の初期値
+      // var j = 0;  // while処理用の初期値
       var sliderSum = 0;　//合計していくものの初期値
-      while(j < sliderListChild.length){   //widthの合計で位置情報を得るためのwhile文
-        sliderSum = sliderSum + sliderSize[j];
-
-        //console.log(sliderSum);
+      for(var j = 0; j < sliderListChild.length; j++){   //widthの合計で位置情報を得るためのwhile文
+        sliderSum += sliderSize[j - 1] || 0;
+        
+        // console.log(sliderSum);
         sliderPlus[j] = sliderSum;　//[j]の時にsliderSumを入れて配列にする
-        j++;    //while内は順番を気にする　j++が上にあるとj = 0の時の処理がされない
+        // j++;    //while内は順番を気にする　j++が上にあるとj = 0の時の処理がされない
       }
-      sliderPlus.unshift(sliderCurrent); //先頭に要素を追加する　最初の場所は0
+      // sliderPlus.unshift(sliderCurrent); //先頭に要素を追加する　最初の場所は0
       console.log(sliderPlus); //  >>sliderPlusは　[0, 600, 1200, 1800]
 
       var sliderListSize = sliderPlus[sliderListChild.length]　//imageが増えた時に対応できるよう　slider-listの幅をsliderPlusの引数が最大時のサイズにする
       $(".slider-list").width(sliderListSize);
 
       $(".slider-ctrl-btn").click(function() {   //btnをクリックしたとき
-        if(clickFlag === true && $(this).data("ctrl") === "prev"){　//clickFlagがtrueかつctrlがprevなら
+        if(clickFlag && $(this).data("ctrl") === "prev"){　//clickFlagがtrueかつctrlがprevなら
           clickFlag = false;　　//flagを一回折って連打しても次のアニメーションが進まないようにする
           sliderCount--;        //sliderCountをクリックするたびマイナスにする
           if(sliderCount < 0){　//端まで来たら反対側に飛ばす処理
             sliderCount = sliderListChild.length-1;　　//sliderCountを最大のsliderListChild.length-1に置き換える
-            $(".slider-area").width(sliderSize[sliderCount]);   //slider-areaのwidthをsliderSizeと合わせることで違う大きさのもの対応する
-            $(".slider-list").stop().animate({
-              left: -sliderPlus[sliderCount]  //sliderArrayの引数にsliderCountを使う　これで場所の指定をする
-            } ,500, function() {
-              clickFlag = true;   //animationが終わったらflagを立て直す
-            });
+            // $(".slider-area").width(sliderSize[sliderCount]);   //slider-areaのwidthをsliderSizeと合わせることで違う大きさのもの対応する
             console.log(sliderCount); //elseの処理はこれとほとんど変わらない
-          }else{
-            $(".slider-area").width(sliderSize[sliderCount])
-            $(".slider-list").stop().animate({
-              left: -sliderPlus[sliderCount]
-            },500, function(){
-              clickFlag = true;
-            });
-            console.log(sliderCount);
-          };
+          }
 
-        }else if(clickFlag === true && $(this).data("ctrl") === "next"){
+        }else if(clickFlag && $(this).data("ctrl") === "next"){
           clickFlag = false;
           sliderCount++;
           if(sliderCount > sliderListChild.length-1){
             sliderCount = 0;
-            $(".slider-area").width(sliderSize[sliderCount]);
-            $(".slider-list").stop().animate({
-              left: -sliderPlus[0]
-            }, 500, function() {
-              clickFlag = true;
-            });
-            console.log(sliderCount);
-          }else{
-            $(".slider-area").width(sliderSize[sliderCount]);
-            $(".slider-list").stop().animate({
-              left: -sliderPlus[sliderCount]
-            }, 500, function(){
-              clickFlag = true;
-            });
             console.log(sliderCount);
           }
         }
+        $(".slider-area").width(sliderSize[sliderCount])
+        $(".slider-list").stop().animate({
+          left: -sliderPlus[sliderCount]  //sliderArrayの引数にsliderCountを使う　これで場所の指定をする
+        } ,500, function() {
+          clickFlag = true;   //animationが終わったらflagを立て直す
+        });
       });
     })
     

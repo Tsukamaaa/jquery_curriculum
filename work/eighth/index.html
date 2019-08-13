@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="scroll__html">
+<html>
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="../../common/css/base.css">
     <link rel="stylesheet" href="./css/style.css">
   </head>
-  <body class="scroll__body">
+  <body>
     <div class="wrapper">
       <div class="menu">
         <span class="menu__btn" data-scroll-place-type="home">Home</span>
@@ -48,12 +48,12 @@
         $(".menu__btn").click(function() {
           var speed = 500;  // >>スクロールするスピードの指定
           var target = $(this).data("scroll-place-type");  // >>clickしたもののdata取得 thisはmenu__btn
-
           $(".contents").children(".title").each(function(index,item) {  //thisありすぎ問題解決用
-            if($(item).data("scroll-place-type") === target){           //indexがないとitemにindexが入る　第一引数がindex,第二引数がitemっぽい
+            var scrollData = $(item).data("scroll-place-type")
+            if(scrollData === target){           //indexがないとitemにindexが入る　第一引数がindex,第二引数がitemっぽい
               var targetPosition = $(item).offset().top;    //item =  $(".contents").children(".title")のtopを取得
               //console.log(targetPosition);  //ここだと中身が見れる
-              $(".scroll__body,.scroll__html").animate({  //body or htmlをanimateでスクロールする
+              $("body,html").animate({  //body or htmlをanimateでスクロールする
                 scrollTop: targetPosition
               }, speed)  //.scroll__body,.scroll__htmlがwindow,documentだと動かない
               //console.log(targetPosition);
@@ -64,15 +64,15 @@
         $(document).scroll(function() {  //windowでも動くけどwindowのほうが読み込む量が多いと思う
           var targetScroll = $(".contents").offset().top;　//文字の入ったcontentsの高さを変数に格納する
           var scrollCount = $(document).scrollTop();       //documentのトップからのスクロール量を格納する
+          //console.log(scrollCount);　上から数えたスクロール量っぽい
           if(scrollCount > targetScroll){                  //scroll量がtargetScrollのラインを越えたらボタンをfadeIn,戻ったらfadeOut
             $(".scrollTopBtn").fadeIn(500);
           }else{
             $(".scrollTopBtn").fadeOut(500);
           };
         });
-
         $(".scrollTopBtn").click(function() { //出てきたボタンを押してトップに移動する処理
-          $(".scroll__body,.scroll__html").animate({　//タグで飛ぶ時と同様にhtml,bodyをスライドさせる
+          $("body,html").animate({　//タグで飛ぶ時と同様にhtml,bodyをスライドさせる
             scrollTop: 0
           }, 300)
         })

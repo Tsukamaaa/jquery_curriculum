@@ -119,16 +119,19 @@
 // });
     
 $(function() {
-  $("select").change(function() {  //change()は中の値が変更されたら実行される
+  $(".select").change(function() {  //change()は中の値が変更されたら実行される
     var Val = $(this).val();      //selectのoptionのvalueを変数に格納する
-    if(Val == "all"){             //条件分岐を作る 変数の中身がallの場合
+    if(Val === "all"){             //条件分岐を作る 変数の中身がallの場合
       $(".list").children("li").show();   //すべてを表示すればよいので.list liをshow();
     }else {
-      $(".list").children("li").each(function() {  //all以外の場合さらに条件を付ける
-        if($(this).data("category-type") == Val){  //category-typeと変数が等しい場合
-          $(this).show();                          //表示する
+      $(".list").children("li").each(function(index,item) { 
+        console.log(index, item);
+        console.log(this);
+         //all以外の場合さらに条件を付ける
+        if($(item).data("category-type") === Val){  //category-typeと変数が等しい場合
+          $(item).show();                          //表示する
         }else {                                    //category-typeと変数が等しくない場合
-          $(this).hide();                          //表示しない
+          $(item).hide();                          //表示しない
         }
       });
     }

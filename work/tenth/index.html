@@ -68,6 +68,164 @@
       //
       //
       //
+      $(function() {
+        var clickFlag = true; 
+        var clickNum = 0;
+        var originalKeyword = ''; //入力値を格納
+        var changedKeyword = ''; //全角を半角に直して格納
+        var inputRepeat = '';　//入力値が同じだったらの処理用
+
+        $('.search__text__input').blur(function() {   //inputの中身が全角でも半角として認識するよう処理する
+          changeInput();
+        }); //blur
+        function changeInput() {
+          originalKeyword = $('.search__text__input').val();  //変数の中身はinputの中身　正規表現で置き換える　正規表現はまとめてノートに書いとけ
+          changedKeyword =  originalKeyword.replace(/[Ａ-Ｚａ-ｚ０-９]/g,function(s){
+            console.log(s);                                    //sの中身は全角文字が入っている　打った文字全部/gで読み取ってくれる
+            return String.fromCharCode(s.charCodeAt(0)-0xFEE0) //0xFEE0分シフトすると全角が半角になるらしい
+          });                                                  //charCodeAtは10進数に変換する　ｓのcharCodeAtから0xFEE0をひいてその数をfromCharCodeで文字化しているっぽい
+          // console.log(originalKeyword);                     originalとchangedの確認用
+          // console.log(changedKeyword);
+        };  //blur
+
+        $('.search__btn').click(function(){ //clickの処理
+          clickNum++;
+          // console.log(inputRepeat);　キーワードの保存用
+          $('.search__btn').prop('disabled', true);
+          if(changedKeyword === '' && clickFlag === true){  //if文に優先順位があるっぽい　検索ワードがなかった時の表示処理
+            $('.message').remove();                         //messageがあったら削除する
+            $('.lists').html('<div class="message">キーワードがありません。<br>キーワードを指定してください。</div>')
+            clickFlag = false;　　　                        //新しいキーワードで検索しないと進めなくする
+          }else if(changedKeyword !== inputRepeat){  //新しいキーワードで検索されたとき
+            clickFlag = true;
+            clickNum = 1;               //clickNumを1にすることでページを指定する
+            console.log('done!');       //どこが作動しているか確認用
+            console.log(changedKeyword);//今現在の検索ワード
+            clickDeal();                //本命の処理
+          }else if(changedKeyword === inputRepeat && clickFlag === true){ //同じワードで検索されたとき
+            console.log(changedKeyword);            //clickDealSameのelseを通ったらflagがfalseになるのでメッセージの積み重ねを防げる
+            console.log('Done!');                   //どこが作動しているか確認用
+            console.log(clickNum);                  //今のページ数
+            clickDealSame();                        //本命の処理
+          }; //if文終わり
+
+          setTimeout(function(){ //検索してから500㎳あけないと次の検索をできないようにする
+            $('.search__btn').prop('disabled', false);  // disabledをtrueにするとボタンが押せなくなる
+          }, 500)
+          inputRepeat = changedKeyword;　//処理が終わった後に今の検索ワードを保存する
+        }); //search__btn function
+
+        function clickDeal() {
+          $.ajax({
+            url: 'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522',
+            type: 'GET',　　　  //情報をもらうのでGET
+            datatype: 'json',　 //dataのタイプはjson
+            data: {
+              // 「区分:サービス固有パラメーター」を確認して、必要な情報をdata内に入れましょう。
+              applicationId: '1019399324990976605', // (今回はこのIDを使用してください)
+              booksGenreId: '001',
+              hits: 20,                 //一回にもらえるデータの数を指定する
+              keyword: changedKeyword,  //changedwordをキーワードとして渡す
+              page: clickNum            //clickNumでページ数を操作する
+            }, //data
+          }).done(function(data) {
+            $('.message').remove();         //messageがあったら削除する
+            // この中にデータ取得後の動きを記述していきます。
+            var listPlus = '';              //each処理の前で宣言しないと前のデータに前のデータ+新しいデータが乗る形になる
+            console.log(data);              //とりあえずデータ見る
+            if(data.count > 0){　　         //dataが一つ以上返ってきたら
+              $.each(data.Items, function(index, item){
+                var listUrl = item.Item.itemUrl;
+                var listTitle = item.Item.title;
+                var listImage = item.Item.largeImageUrl;
+                var listAuthor = item.Item.author;
+                var listPublisher = item.Item.publisherName;
+                var listInfo = '<li class="lists__item"><div class="lists__item__inner"><a href="'+listUrl+'"" class="lists__item__link" target="_blank"><img src="'+listImage+'" class="lists__item__img" alt="'+listTitle+'"><p class="lists__item__detail">作品名：'+listTitle+'</p><p class="lists__item__detail">作者："'+listAuthor+'"</p><p class="lists__item__detail">出版社："'+listPublisher+'"</p></a></div></li>'
+                listPlus += listInfo;　　//listInfoをlistPlusの中に格納しまくる
+              }); //each
+              $('.lists').html(listPlus);　//listPlusをhtmlで表示　htmlだと上書きできるから前の検索結果を塗りつぶせる
+
+            }else{                          //dataが返ってこなかったら
+              $('.lists').html('<div class="message">検索結果が見つかりませんでした。<br>別のキーワードで探してください。</div>')
+            }; //if文終わり         listsに上に変えてあるもの全部つける
+
+          }) //done
+            .fail(function(data) {        //通信ができなかったとき
+              $('.message').remove();     //messageがあったら削除する
+              console.log(data);          //とりあえずdataを表示する
+              if(data.responseJSON.error === 'wrong_parameter'){   //data見てkeyを指定する　　英数字1文字の時のエラー表示
+                clickFlag = false;                                 //ここでflagを折ることで新しいキーワードで検索しないと進めなくする
+                $('.lists').html('<div class="message">検索結果が見つかりませんでした。<br>2文字以上のキーワードで探してください。</div>');
+                                                                  //falseで折ってるから連打できない
+              }else if(data.responseJSON.error === 'system_error'){ //システムエラーの時の処理
+                alert('システムエラーが発生しております。\nメンテナンス終了までお待ちください。')
+              }else if(data.responseJSON.error === 'service_unavailable'){
+                alert('システムメンテナンス中です。\nメンテナンス終了までお待ちください。')
+              };　//if文終わり                        alertのほうが画面の動作を止められるのでメッセージを読んでくれそう
+            }); //fail
+        }; //clickDeal
+
+        function clickDealSame() {       //検索ワードが同じだった時の処理
+          $.ajax({
+            url: 'https://app.rakuten.co.jp/services/api/BooksTotal/Search/20130522',
+            type: 'GET',
+            datatype: 'json',
+            data: {
+              // 「区分:サービス固有パラメーター」を確認して、必要な情報をdata内に入れましょう。
+              applicationId: '1019399324990976605', // (今回はこのIDを使用してください)
+              booksGenreId: '001',
+              hits: 20,
+              keyword: changedKeyword,
+              page: clickNum
+            }, //data
+          }).done(function(data) {
+            // この中にデータ取得後の動きを記述していきます。
+            var listPlus = '';　                            //名前は変えるべき？
+            console.log(data);　                            // とりあえずデータ見る
+            if(data.count > 0){
+              $.each(data.Items, function(index, item){
+                var listUrl = item.Item.itemUrl;
+                var listTitle = item.Item.title;
+                var listImage = item.Item.largeImageUrl;
+                var listAuthor = item.Item.author;
+                var listPublisher = item.Item.publisherName;
+                var listInfo = '<li class="lists__item"><div class="lists__item__inner"><a href="'+listUrl+'"" class="lists__item__link" target="_blank"><img src="'+listImage+'" class="lists__item__img" alt="'+listTitle+'"><p class="lists__item__detail">作品名：'+listTitle+'</p><p class="lists__item__detail">作者："'+listAuthor+'"</p><p class="lists__item__detail">出版社："'+listPublisher+'"</p></a></div></li>'
+                listPlus += listInfo;
+              }) //each
+              $('.lists').prepend(listPlus);　　　//上に積んでいくからprependでlistPlusを呼ぶ
+
+            }else{                               //検索結果がこれ以上なかった時
+              $('.lists').before('<div class="message">検索結果が見つかりませんでした。<br>別のキーワードで探してください。</div>')
+              clickFlag = false;                 //見本がbeforeだったのでbefore
+            }; //if文終わり                       //検索結果がなかった時にflagを折ることでエラーメッセージの積み重ねを防ぐ
+
+          }) //done
+            .fail(function(data) {                //通信が失敗したとき
+              console.log(data);                  //とりあえず帰ってきたデータ見る
+              if(data.responseJSON.error === 'too_many_requests'){
+              alert('リクエストが上限に達しました。\nしばらく時間を空けてからご利用ください。')  //alertだと強制的に画面操作が止められる
+              }else if(data.responseJSON.error === 'system_error'){　//else if2つはclickDealと同じ
+                alert('システムエラーが発生しております。\nメンテナンス終了までお待ちください。')
+              }else if(data.responseJSON.error === 'service_unavailable'){
+                alert('システムメンテナンス中です。\nメンテナンス終了までお待ちください。')
+              };  //if文終わり
+            });  //fail
+        }; //clickDealSame
+
+      })  //wrapper function
+
+          //APIとは
+          // ソフトウェアを他のソフトウェアと共有するもの、アプリケーション同士で連携が可能
+          // APIは機能+仕様書、同じプログラムを1から作る必要がないので効率が上がる
+          // facebookのアカウントを使ってできるインスタグラムみたいな
+
+          //GETとPOST
+          // GETは何かを取得するときに使う、urlにリクエスト内容を付与してサーバーに送る
+          // urlにつけるので他人に見られたくない情報を付与してはいけない
+          // ブックマークができる
+          POSTはbodyに情報を付与して送る、ユーザーと登録をするときなどに使う
+          bodyに付与して情報を送るので他人から覗かれない
+          ブックマークはできない
     </script>
   </body>
 </html>
